@@ -5,6 +5,7 @@ import pygame
 
 from scripts.particle import Particle
 
+
 class PhysicsEntity:
     def __init__(self, game, e_type, pos, size):
         self.game = game
@@ -77,6 +78,41 @@ class PhysicsEntity:
                   (self.pos[0] - offset[0] + self.anim_offset[0], self.pos[1] - offset[1] + self.anim_offset[1]))
 
 
+class Enemy(PhysicsEntity):
+    def __int__(self, game, pos, size):
+        super().__init__(game, 'enemy', pos, size)
+
+        self.walking = 0
+
+    def update(self, tilemap, movement=(0, 0)):
+        if self.walking:
+            if tilemap.solid_check((self.rect().centerx + (-7 if self.flip else 7), self.pos[1] + 23)):
+                if (self.collisions['right'] or self.collisions['left']):
+                    self.flip = not self.flip
+                else:
+                    movement = (movement[0] - 0.5 if self.flip else 0.5, movement[1])
+            else:
+                self.flip = not self.flip
+            self.walking = max(0, self.walking - 1)
+        elif random.random() < 0.01:
+            self.walking = random.randint(30, 120)
+
+        super().update(tilemap, movement=movement)
+
+        if movement[0] != 0:
+            self.set_action('run')
+        else:
+            self.set_action('idle')
+
+    def render(self, surf, offset=(0, 0)):
+        super().render(surf, offset=offset)
+
+        if self.flip:
+            surf.blit(pygame.transform.flip(self.game.assets['gun'], True, False), (self.rect().centerx -4 - self.game.assets['gun'].get_width() - offset[0], self.rect().centery - offset[1]))
+        else:
+            surf.blit(self.game.assets['gun'],(self.rect().centerx +4 - offset[0], self.rect().centery - offset[1]))
+
+
 class Player(PhysicsEntity):
     def __init__(self, game, pos, size):
         super().__init__(game, 'player', pos, size)
@@ -116,7 +152,8 @@ class Player(PhysicsEntity):
                 angle = random.random() * math.pi * 2
                 speed = random.random() * 0.5 + 0.5
                 pvelocity = [math.cos(angle) * speed, math.sin(angle) * speed]
-                self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=pvelocity, frame=random.randint(0,7)))
+                self.game.particles.append(
+                    Particle(self.game, 'particle', self.rect().center, velocity=pvelocity, frame=random.randint(0, 7)))
 
         if self.dashing > 0:
             self.dashing = max(0, self.dashing - 1)
@@ -127,7 +164,8 @@ class Player(PhysicsEntity):
             if abs(self.dashing) == 51:
                 self.velocity[0] *= 0.1
             pvelocity = [abs(self.dashing) / self.dashing * random.random() * 3, 0]
-            self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=pvelocity, frame=random.randint(0, 7)))
+            self.game.particles.append(
+                Particle(self.game, 'particle', self.rect().center, velocity=pvelocity, frame=random.randint(0, 7)))
 
         if self.velocity[0] > 0:
             self.velocity[0] = max(self.velocity[0] - 0.1, 0)
@@ -137,7 +175,7 @@ class Player(PhysicsEntity):
     def render(self, surf, offset=(0, 0)):
         if abs(self.dashing) <= 50:
             super().render(surf, offset=offset)
-        
+
     def jump(self):
         if self.wall_slide:
             if self.flip and self.last_movement[0] < 0:
