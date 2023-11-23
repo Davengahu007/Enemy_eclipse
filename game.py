@@ -1,7 +1,6 @@
 import math
 import random
 import sys
-
 import pygame
 
 from scripts.utils import load_image, load_images, Animation
