@@ -114,6 +114,15 @@ class Editor:
                         if event.button == 5:
                             self.tile_group = (self.tile_group + 1) % len(self.tile_list)
                             self.tile_variant = 0
+
+                """ Separate handling for touchpad events"""
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:  # Handle touchpad scroll up
+                    self.tile_variant = (self.tile_variant - 1) % len(
+                        self.assets[self.tile_list[self.tile_group]])
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:  # Handle touchpad scroll down
+                    self.tile_variant = (self.tile_variant + 1) % len(
+                        self.assets[self.tile_list[self.tile_group]])
+
                 if event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1:
                         self.clicking = False
