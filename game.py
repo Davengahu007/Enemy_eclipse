@@ -71,6 +71,8 @@ class Game:
         self.menu = Menu(self.screen)
 
         self.level = 0
+        self.lives = 3
+        self.lives_font = pygame.font.Font(None, 24)
         self.load_level(self.level)
 
         self.screenshake = 0
@@ -178,11 +180,14 @@ class Game:
         pygame.mixer.music.load('data/music.wav')
         pygame.mixer.music.set_volume(0.5)
         pygame.mixer.music.play(-1)
+        heart_font = pygame.font.SysFont('segoeuisymbol', 20)
+        heart_emoji = '❤️'
 
         self.sfx['ambience'].play(-1)
 
         # Initially show the menu
         self.in_menu = True
+
 
         while True:
             if self.in_menu:
@@ -194,7 +199,6 @@ class Game:
             else:
                 self.display.fill((0, 0, 0, 0))
                 self.display_2.blit(self.assets['background'], (0, 0))
-
                 self.screenshake = max(0, self.screenshake - 1)
 
                 if not len(self.enemies):
@@ -212,7 +216,13 @@ class Game:
                         self.transition = min(30, self.transition + 1)
                     if self.dead > 40:
                         self.show_death_indicator()
-                        self.load_level(self.level)
+                        self.lives -= 1  # Decrease a life
+                        if self.lives > 0:
+                            self.load_level(self.level)  # Respawn in current level
+                        else:
+                            self.lives = 3  # Reset lives
+                            self.level = 0  # Start from first level
+                            self.load_level(self.level)  # Respawn in first level
 
                 self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]) / 30
                 self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1]) / 30
@@ -316,11 +326,20 @@ class Game:
                     transition_surf.set_colorkey((255, 255, 255))
                     self.display.blit(transition_surf, (0, 0))
 
+                    # Draw the lives text after all game updates but before blitting to self.display_2
+                for i in range(self.lives):
+                    heart_surface = heart_font.render(heart_emoji, True, (255, 0, 0))  # Render the heart emoji
+                    self.display.blit(heart_surface, (10 + i * (heart_surface.get_width() + 5), 10))
+
+                # Blit self.display onto self.display_2
                 self.display_2.blit(self.display, (0, 0))
 
+                # Final blit operations to self.screen with screenshake effect
                 screenshake_offset = (random.random() * self.screenshake - self.screenshake / 2,
                                       random.random() * self.screenshake - self.screenshake / 2)
                 self.screen.blit(pygame.transform.scale(self.display_2, self.screen.get_size()), screenshake_offset)
+
+                # Update the display and tick the clock
                 pygame.display.update()
                 self.clock.tick(60)
                 self.update_high_score()
