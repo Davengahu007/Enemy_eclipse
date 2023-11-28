@@ -18,7 +18,7 @@ class Game:
     def __init__(self):
         pygame.init()
 
-        pygame.display.set_caption('enemy eclipse')
+        pygame.display.set_caption('Enemy Eclipse')
         self.screen = pygame.display.set_mode((640, 480))
         self.display = pygame.Surface((320, 240), pygame.SRCALPHA)
         self.display_2 = pygame.Surface((320, 240))
@@ -68,7 +68,7 @@ class Game:
 
         self.tilemap = Tilemap(self, tile_size=16)
 
-        self.menu = Menu(self.screen)
+        self.menu = Menu(self.screen,self)
 
         self.level = 0
         self.lives = 3
@@ -172,9 +172,6 @@ class Game:
         while pygame.time.get_ticks() - start_time < 1000:
             pygame.event.pump()
 
-    def update_high_score(self):
-        if self.level > self.menu.high_score:
-            self.menu.high_score = self.level
 
     def run(self):
         pygame.mixer.music.load('data/music.wav')
@@ -342,7 +339,6 @@ class Game:
                 # Update the display and tick the clock
                 pygame.display.update()
                 self.clock.tick(60)
-                self.update_high_score()
 
 
 Game().run()
