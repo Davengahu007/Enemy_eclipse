@@ -13,7 +13,7 @@ class Menu:
         self.background = pygame.transform.scale(self.background, self.screen.get_size())
 
         # Load icon image
-        icon_path = os.path.join('data', 'images', 'start.png')  # Update with the correct path to your icon
+        icon_path = os.path.join('data', 'images', 'start.png')
         self.icon = pygame.image.load(icon_path)
         white = (255, 255, 255)
         self.icon.set_colorkey(white)

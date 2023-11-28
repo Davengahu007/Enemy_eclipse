@@ -154,6 +154,9 @@ class Player(PhysicsEntity):
         self.wall_slide = False
         self.dashing = 0
 
+        self.emoji_font = pygame.font.SysFont('segoeuisymbol', 12)  # Use a font that supports emojis
+        self.emoji = '💫'
+
     def update(self, tilemap, movement=(0, 0)):
         super().update(tilemap, movement=movement)
 
@@ -213,6 +216,12 @@ class Player(PhysicsEntity):
     def render(self, surf, offset=(0, 0)):
         if abs(self.dashing) <= 50:
             super().render(surf, offset=offset)
+
+        emoji_surface = self.emoji_font.render(self.emoji, True, (255, 255, 255))
+        emoji_x = self.pos[0] - offset[0] + self.size[0] / 2 - emoji_surface.get_width() / 2
+        emoji_y = self.pos[1] - offset[
+            1] - emoji_surface.get_height() - 5  # Adjust -5 for the gap between emoji and character
+        surf.blit(emoji_surface, (emoji_x, emoji_y))
 
     def jump(self):
         if self.wall_slide:

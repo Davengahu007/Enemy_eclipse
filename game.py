@@ -73,7 +73,7 @@ class Game:
         self.level = 0
         self.lives = 3
         self.lives_font = pygame.font.Font(None, 24)
-        self.load_level(self.level)
+
 
         self.screenshake = 0
         self.level_indicator_shown = False
