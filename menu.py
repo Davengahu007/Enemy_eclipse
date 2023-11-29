@@ -27,6 +27,11 @@ class Menu:
         self.mute_icon = self.load_and_make_circular('data/images/mute.png')
         self.music_icon_rect = self.music_icon.get_rect(midtop=(self.icon_rect.centerx, self.icon_rect.bottom + 10))
 
+        logo_path = os.path.join('data', 'images', 'logo.png')  # Replace with your logo file path
+        self.logo = self.load_and_make_circular(logo_path)
+        self.logo_rect = self.logo.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2 - 50))
+
+
     def load_and_make_circular(self, image_path):
         # Load the image
         image = pygame.image.load(image_path).convert_alpha()
@@ -43,11 +48,7 @@ class Menu:
     def display(self):
         self.screen.blit(self.background, (0, 0))
 
-        game_name_text = "Enemy Eclipse"
-        game_name_surface = self.menu_font_large.render(game_name_text, True, (0, 0, 0))
-        game_name_rect = game_name_surface.get_rect(
-            center=(self.screen.get_width() // 2, self.screen.get_height() // 2 - 50))
-        self.screen.blit(game_name_surface, game_name_rect)
+        self.screen.blit(self.logo, self.logo_rect.topleft)
 
         self.screen.blit(self.icon, self.icon_rect.topleft)
 
