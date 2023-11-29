@@ -59,6 +59,17 @@ class Menu:
 
         pygame.display.flip()
 
+    def toggle_sounds(self):
+        self.music_on = not self.music_on
+        if self.music_on:
+            pygame.mixer.music.set_volume(0.5)  # Set music volume back to normal
+            for sound in self.game.sfx.values():
+                sound.set_volume(1)  # Set SFX volume back to normal (or your default level)
+        else:
+            pygame.mixer.music.set_volume(0)  # Mute music
+            for sound in self.game.sfx.values():
+                sound.set_volume(0)  # Mute SFX
+
     def handle_input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -70,10 +81,6 @@ class Menu:
                     # Start the game or some other action
                     return True
                 elif self.music_icon_rect.collidepoint(mouse_pos):
-                    # Toggle the music state
-                    self.music_on = not self.music_on
-                    if self.music_on:
-                        pygame.mixer.music.play(-1)  # Play music in a loop
-                    else:
-                        pygame.mixer.music.stop()  # Stop the music
+                    self.toggle_sounds()  # Toggle all sounds
+
         return False
