@@ -1,3 +1,4 @@
+"""designed to handle various aspects of a tile-based map system."""
 import pygame
 import json
 
@@ -25,6 +26,7 @@ class Tilemap:
         self.tilemap = {}
         self.offgrid_tiles = []
 
+    """Extracts specific tiles based on given criteria."""
     def extract(self, id_pairs, keep=False):
         matches = []
         keys_to_remove = []
@@ -51,6 +53,7 @@ class Tilemap:
 
         return matches
 
+    """Retrieves tiles surrounding a given position"""
     def tiles_around(self, pos):
         tiles = []
         tile_loc = (int(pos[0] // self.tile_size), int(pos[1] // self.tile_size))
@@ -60,6 +63,7 @@ class Tilemap:
                 tiles.append(self.tilemap[check_loc])
         return tiles
 
+    """Methods to save the current tilemap to a file"""
     def save(self, path):
         f = open(path, 'w')
         json.dump({
@@ -69,6 +73,7 @@ class Tilemap:
         }, f)
         f.close()
 
+    """load a tilemap from a file, utilizing JSON for data storage"""
     def load(self, path):
         f = open(path, 'r')
         map_data = json.load(f)
@@ -78,12 +83,14 @@ class Tilemap:
         self.tile_size = map_data['tile_size']
         self.offgrid_tiles = map_data['offgrid']
 
+    """Checks if a given position intersects with a 'solid' tile, used for physics or collision detection."""
     def solid_check(self, pos):
         tile_loc = str(int(pos[0] // self.tile_size))  + ';' + str(int(pos[1] // self.tile_size))
         if tile_loc in self.tilemap:
             if self.tilemap[tile_loc]['type'] in PHYSICS_TILES:
                 return self.tilemap[tile_loc]
 
+    """Generates Pygame Rect objects for physics-enabled tiles around a given position"""
     def physics_rects_around(self, pos):
         rects = []
         for tile in self.tiles_around(pos):
@@ -93,6 +100,7 @@ class Tilemap:
                                 self.tile_size))
         return rects
 
+    """Automatically adjusts tile variants based on neighboring tiles"""
     def autotile(self):
         for loc in self.tilemap:
             tile = self.tilemap[loc]
@@ -118,6 +126,7 @@ class Tilemap:
                     tile = self.tilemap[loc]
                     surf.blit(self.game.assets[tile['type']][tile['variant']], (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))
 
+    """Clears the current tilemap and off-grid tiles"""
     def clear(self):
         self.tilemap = {}
         self.offgrid_tiles = []
