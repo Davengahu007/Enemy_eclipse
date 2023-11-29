@@ -4,6 +4,8 @@ import pygame
 
 BASE_IMG_PATH = 'data/images/'
 
+"""Loads a single image from  specified path."""
+
 
 def load_image(path):
     img = pygame.image.load(BASE_IMG_PATH + path).convert()
@@ -11,6 +13,7 @@ def load_image(path):
     return img
 
 
+"""Loads all images from specified directory."""
 def load_images(path):
     images = []
     for img_name in sorted(os.listdir(BASE_IMG_PATH + path)):
@@ -18,6 +21,7 @@ def load_images(path):
     return images
 
 
+"""Manages an animation sequence from a list of images."""
 class Animation:
     def __init__(self, images, img_dur=5, loop=True):
         self.images = images
@@ -29,6 +33,7 @@ class Animation:
     def copy(self):
         return Animation(self.images, self.img_duration, self.loop)
 
+    """Advances the animation frame"""
     def update(self):
         if self.loop:
             self.frame = (self.frame + 1) % (self.img_duration * len(self.images))
@@ -37,5 +42,6 @@ class Animation:
             if self.frame >= self.img_duration * len(self.images) - 1:
                 self.done = True
 
+    """Returns the current image of the animation """
     def img(self):
         return self.images[int(self.frame / self.img_duration)]

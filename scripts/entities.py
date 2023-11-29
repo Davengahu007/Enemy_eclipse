@@ -6,6 +6,8 @@ import pygame
 from scripts.particle import Particle
 from scripts.spark import Spark
 
+"""A base class for game entities that have physics-based interactions."""
+
 
 class PhysicsEntity:
     def __init__(self, game, e_type, pos, size):
@@ -30,6 +32,8 @@ class PhysicsEntity:
         if action != self.action:
             self.action = action
             self.animation = self.game.assets[self.type + '/' + self.action].copy()
+
+    """Handles the entity's movement and collision detection with a tilemap"""
 
     def update(self, tilemap, movement=(0, 0)):
         self.collisions = {'up': False, 'down': False, 'right': False, 'left': False}
@@ -85,6 +89,8 @@ class Enemy(PhysicsEntity):
 
         self.walking = 0
 
+    """Implements enemy-specific behaviors"""
+
     def update(self, tilemap, movement=(0, 0)):
         if self.walking:
             if tilemap.solid_check((self.rect().centerx + (-7 if self.flip else 7), self.pos[1] + 23)):
@@ -136,12 +142,14 @@ class Enemy(PhysicsEntity):
                 self.game.sparks.append(Spark(self.rect().center, math.pi, 5 + random.random()))
                 return True
 
+    """Renders the enemy and its gun on the screen"""
     def render(self, surf, offset=(0, 0)):
         super().render(surf, offset=offset)
 
         if self.flip:
             surf.blit(pygame.transform.flip(self.game.assets['gun'], True, False), (
-            self.rect().centerx - 4 - self.game.assets['gun'].get_width() - offset[0], self.rect().centery - offset[1]))
+                self.rect().centerx - 4 - self.game.assets['gun'].get_width() - offset[0],
+                self.rect().centery - offset[1]))
         else:
             surf.blit(self.game.assets['gun'], (self.rect().centerx + 4 - offset[0], self.rect().centery - offset[1]))
 
@@ -157,6 +165,7 @@ class Player(PhysicsEntity):
         self.emoji_font = pygame.font.SysFont('segoeuisymbol', 12)  # Use a font that supports emojis
         self.emoji = '💫'
 
+    """Manages the player's movement and actions, updates player position based on input and applies gravity"""
     def update(self, tilemap, movement=(0, 0)):
         super().update(tilemap, movement=movement)
 
@@ -223,6 +232,7 @@ class Player(PhysicsEntity):
             1] - emoji_surface.get_height() - 5  # Adjust -5 for the gap between emoji and character
         surf.blit(emoji_surface, (emoji_x, emoji_y))
 
+    """Handles the player's jumping logic, including wall jumps and regular jumps."""
     def jump(self):
         if self.wall_slide:
             if self.flip and self.last_movement[0] < 0:
@@ -244,6 +254,7 @@ class Player(PhysicsEntity):
             self.air_time = 5
             return True
 
+    """Initiates the player's dash movement and plays the corresponding sound effect."""
     def dash(self):
         if not self.dashing:
             self.game.sfx['dash'].play()

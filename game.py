@@ -15,6 +15,7 @@ from menu import Menu
 
 
 class Game:
+    """ Initializes the game, setting up the display, loading assets , initializing game entities """
     def __init__(self):
         pygame.init()
 
@@ -74,7 +75,6 @@ class Game:
         self.lives = 3
         self.lives_font = pygame.font.Font(None, 24)
 
-
         self.screenshake = 0
         self.level_indicator_shown = False
         self.in_menu = True
@@ -82,6 +82,7 @@ class Game:
 
         self.spawn_point = None
 
+    """Loads a game level, setting up the environment, player position, enemies, and other entities."""
     def load_level(self, map_id):
         self.show_level_indicator(self.level)
 
@@ -114,6 +115,7 @@ class Game:
         self.dead = 0
         self.transition = -30
 
+    """ Displays a level loading indicator on the screen"""
     def show_level_indicator(self, level):
         indicator_font = pygame.font.Font(None, 36)
         indicator_text = f"Level {level + 1} loading ..."
@@ -133,6 +135,7 @@ class Game:
         while pygame.time.get_ticks() - start_time < 500:
             pygame.event.pump()
 
+    """Manages the transition between levels, showing the level loading indicator."""
     def run_level_indicator(self):
         self.transition = 0
         self.dead = 0
@@ -160,6 +163,7 @@ class Game:
 
         self.load_level(self.level)
 
+    """Displays death indicator on screen"""
     def show_death_indicator(self):
         indicator_font = pygame.font.Font(None, 36)
         indicator_text = "You died!"
@@ -178,7 +182,7 @@ class Game:
         while pygame.time.get_ticks() - start_time < 1000:
             pygame.event.pump()
 
-
+    """the main game loop"""
     def run(self):
         pygame.mixer.music.load('data/music.wav')
         pygame.mixer.music.set_volume(0.5)
@@ -197,11 +201,14 @@ class Game:
                     self.in_menu = False
                     self.level = 0
                     self.run_level_indicator()
+
+                    """When not in the menu"""
             else:
                 self.display.fill((0, 0, 0, 0))
                 self.display_2.blit(self.assets['background'], (0, 0))
                 self.screenshake = max(0, self.screenshake - 1)
 
+                """check if there are enemies left"""
                 if not len(self.enemies):
                     self.transition += 1
                     if self.transition > 30:
@@ -240,6 +247,7 @@ class Game:
 
                 self.tilemap.render(self.display, offset=render_scroll)
 
+                """Updates and renders each enemy"""
                 for enemy in self.enemies.copy():
                     kill = enemy.update(self.tilemap, (0, 0))
                     enemy.render(self.display, offset=render_scroll)
@@ -250,6 +258,7 @@ class Game:
                     self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
                     self.player.render(self.display, offset=render_scroll)
 
+                """Updates and renders projectiles"""
                 for projectile in self.projectiles.copy():
                     projectile[0][0] += projectile[1]
                     projectile[2] += 1
@@ -285,6 +294,7 @@ class Game:
                     if kill:
                         self.sparks.remove(spark)
 
+                """create shadow effect by rendering silhouette"""
                 display_mask = pygame.mask.from_surface(self.display)
                 display_sillhouette = display_mask.to_surface(setcolor=(0, 0, 0, 180), unsetcolor=(0, 0, 0, 0))
                 for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
@@ -298,6 +308,7 @@ class Game:
                     if kill:
                         self.particles.remove(particle)
 
+                """Handles various events like quitting or key presses/releases for player movement and actions"""
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
@@ -318,6 +329,7 @@ class Game:
                         if event.key == pygame.K_RIGHT:
                             self.movement[1] = False
 
+                """Transition Effect:"""
                 if self.transition:
                     transition_surf = pygame.Surface(self.display.get_size())
                     pygame.draw.circle(transition_surf, (255, 255, 255),

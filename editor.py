@@ -1,3 +1,4 @@
+"""provide a map editor for a game, allowing users to create, edit, and save game maps"""
 import sys
 import os
 import json
@@ -55,11 +56,13 @@ class Editor:
         map_files = [f for f in os.listdir(map_folder) if f.endswith('.json')]
         return len(map_files)
 
+    """Clears the current tilemap and sets a default spawn point."""
     def create_new_map(self):
         self.tilemap.clear()
         self.tilemap.autotile()
         self.spawn_point = (100, 100)
 
+    """Loads a map from a file, handling missing files by creating a new map."""
     def load_map(self, map_number):
         map_file_path = f'data/maps/{map_number}.json'
         try:
@@ -74,6 +77,7 @@ class Editor:
             print(f"Map {map_number} not found. Creating a new map.")
             self.create_new_map()
 
+    """Saves the current map state to a file."""
     def save_map(self, map_number):
         map_file_path = f'data/maps/{map_number}.json'
         self.tilemap.save(map_file_path)
@@ -87,6 +91,7 @@ class Editor:
             json.dump(map_data, f)
         print(f"Map {map_number} saved.")
 
+    """loads and displays maps, processes user inputs for map editing, and updates the display at a 60 FPS rate. """
     def run(self):
         map_number = self.get_next_map_number()
         self.load_map(map_number)
@@ -130,6 +135,7 @@ class Editor:
 
             self.display.blit(current_tile_img, (5, 5))
 
+            """event handling user inputs:quitting, editing tiles, selecting tile types, navigating the map editor."""
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -209,7 +215,7 @@ class Editor:
                         self.shift = False
 
             if self.spawn_point:
-                # Optionally, render a visual indicator for the spawn point
+                """Optionally, render a visual indicator for the spawn point"""
                 spawn_indicator = pygame.Surface((self.tilemap.tile_size, self.tilemap.tile_size))
                 spawn_indicator.fill((0, 255, 0))
                 self.display.blit(spawn_indicator, (self.spawn_point[0] * self.tilemap.tile_size - self.scroll[0],
