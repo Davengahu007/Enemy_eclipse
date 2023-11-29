@@ -1,4 +1,6 @@
 import sys
+import os
+import json
 
 import pygame
 
@@ -46,7 +48,49 @@ class Editor:
         self.shift = False
         self.ongrid = True
 
+        self.spawn_point = None
+
+    def get_next_map_number(self):
+        map_folder = 'data/maps'
+        map_files = [f for f in os.listdir(map_folder) if f.endswith('.json')]
+        return len(map_files)
+
+    def create_new_map(self):
+        self.tilemap.clear()
+        self.tilemap.autotile()
+        self.spawn_point = (100, 100)
+
+    def load_map(self, map_number):
+        map_file_path = f'data/maps/{map_number}.json'
+        try:
+            self.tilemap.load(map_file_path)
+            with open(f'data/maps/{map_number}.json', 'r') as f:
+                map_data = json.load(f)
+            self.tilemap.tilemap = map_data['tilemap']
+            self.tilemap.tile_size = map_data['tile_size']
+            self.tilemap.offgrid_tiles = map_data['offgrid']
+            self.spawn_point = map_data.get('spawn_point', None)
+        except FileNotFoundError:
+            print(f"Map {map_number} not found. Creating a new map.")
+            self.create_new_map()
+
+    def save_map(self, map_number):
+        map_file_path = f'data/maps/{map_number}.json'
+        self.tilemap.save(map_file_path)
+        map_data = {
+            'tilemap': self.tilemap.tilemap,
+            'tile_size': self.tilemap.tile_size,
+            'offgrid': self.tilemap.offgrid_tiles,
+            'spawn_point': self.spawn_point
+        }
+        with open(f'data/maps/{map_number}.json', 'w') as f:
+            json.dump(map_data, f)
+        print(f"Map {map_number} saved.")
+
     def run(self):
+        map_number = self.get_next_map_number()
+        self.load_map(map_number)
+
         while True:
             self.display.fill((0, 0, 0))
 
@@ -116,10 +160,10 @@ class Editor:
                             self.tile_variant = 0
 
                 """ Separate handling for touchpad events"""
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:  # Handle touchpad scroll up
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
                     self.tile_variant = (self.tile_variant - 1) % len(
                         self.assets[self.tile_list[self.tile_group]])
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:  # Handle touchpad scroll down
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:
                     self.tile_variant = (self.tile_variant + 1) % len(
                         self.assets[self.tile_list[self.tile_group]])
 
@@ -142,8 +186,14 @@ class Editor:
                         self.ongrid = not self.ongrid
                     if event.key == pygame.K_t:
                         self.tilemap.autotile()
+                    if event.key == pygame.K_n:
+                        map_number = self.get_next_map_number()
+                        self.create_new_map()
                     if event.key == pygame.K_o:
-                        self.tilemap.save('map.json')
+                        self.save_map(map_number)
+                    if event.key == pygame.K_p:
+                        self.spawn_point = tile_pos
+                        print(f"Spawn point set to {self.spawn_point}")
                     if event.key == pygame.K_LSHIFT:
                         self.shift = True
                 if event.type == pygame.KEYUP:
@@ -157,6 +207,13 @@ class Editor:
                         self.movement[3] = False
                     if event.key == pygame.K_LSHIFT:
                         self.shift = False
+
+            if self.spawn_point:
+                # Optionally, render a visual indicator for the spawn point
+                spawn_indicator = pygame.Surface((self.tilemap.tile_size, self.tilemap.tile_size))
+                spawn_indicator.fill((0, 255, 0))
+                self.display.blit(spawn_indicator, (self.spawn_point[0] * self.tilemap.tile_size - self.scroll[0],
+                                                    self.spawn_point[1] * self.tilemap.tile_size - self.scroll[1]))
 
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
             pygame.display.update()

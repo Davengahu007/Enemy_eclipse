@@ -27,21 +27,27 @@ class Tilemap:
 
     def extract(self, id_pairs, keep=False):
         matches = []
+        keys_to_remove = []
+
+        for loc, tile in self.tilemap.items():
+            if (tile['type'], tile['variant']) in id_pairs:
+                match = tile.copy()
+                match['pos'] = match['pos'].copy()
+                match['pos'][0] *= self.tile_size
+                match['pos'][1] *= self.tile_size
+                matches.append(match)
+
+                if not keep:
+                    keys_to_remove.append(loc)
+
+        for loc in keys_to_remove:
+            del self.tilemap[loc]
+
         for tile in self.offgrid_tiles.copy():
             if (tile['type'], tile['variant']) in id_pairs:
                 matches.append(tile.copy())
                 if not keep:
                     self.offgrid_tiles.remove(tile)
-
-        for loc in self.tilemap:
-            tile = self.tilemap[loc]
-            if (tile['type'], tile['variant']) in id_pairs:
-                matches.append(tile.copy())
-                matches[-1]['pos'] = matches[-1]['pos'].copy()
-                matches[-1]['pos'][0] *= self.tile_size
-                matches[-1]['pos'][1] *= self.tile_size
-                if not keep:
-                    del self.tilemap[loc]
 
         return matches
 
@@ -111,3 +117,7 @@ class Tilemap:
                 if loc in self.tilemap:
                     tile = self.tilemap[loc]
                     surf.blit(self.game.assets[tile['type']][tile['variant']], (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))
+
+    def clear(self):
+        self.tilemap = {}
+        self.offgrid_tiles = []

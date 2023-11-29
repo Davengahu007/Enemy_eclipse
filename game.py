@@ -80,14 +80,23 @@ class Game:
         self.in_menu = True
         self.show_level_loading = False
 
+        self.spawn_point = None
+
     def load_level(self, map_id):
-        self.show_level_indicator(self.level)  # Moved from run() to load_level()
+        self.show_level_indicator(self.level)
 
         self.tilemap.load('data/maps/' + str(map_id) + '.json')
 
         self.leaf_spawners = []
         for tree in self.tilemap.extract([('large_decor', 2)], keep=True):
             self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 23, 13))
+
+        """ Position the player at the spawn point"""
+        if self.spawn_point:
+            self.player.pos = list(self.spawn_point)
+        else:
+            """Default position if spawn_point is not set"""
+            self.player.pos = [50, 50]
 
         self.enemies = []
         for spawner in self.tilemap.extract([('spawners', 0), ('spawners', 1)]):
@@ -125,11 +134,10 @@ class Game:
             pygame.event.pump()
 
     def run_level_indicator(self):
-        # Reset the transition and dead states
         self.transition = 0
         self.dead = 0
 
-        # Check if the level loading indicator should be shown
+        """ Check if the level loading indicator should be shown"""
         if self.show_level_loading:
             indicator_font = pygame.font.Font(None, 36)
             indicator_text = f"Level {self.level + 1} loading ..."
@@ -148,10 +156,8 @@ class Game:
             while pygame.time.get_ticks() - start_time < 500:
                 pygame.event.pump()
 
-            # Reset the flag after showing the indicator
             self.show_level_loading = False
 
-        # Load the level
         self.load_level(self.level)
 
     def show_death_indicator(self):
@@ -182,17 +188,15 @@ class Game:
 
         self.sfx['ambience'].play(-1)
 
-        # Initially show the menu
         self.in_menu = True
-
 
         while True:
             if self.in_menu:
                 self.menu.display()
                 if self.menu.handle_input():
                     self.in_menu = False
-                    self.level = 0  # Reset the level when starting a new game
-                    self.run_level_indicator()  # Show level loading screen
+                    self.level = 0
+                    self.run_level_indicator()
             else:
                 self.display.fill((0, 0, 0, 0))
                 self.display_2.blit(self.assets['background'], (0, 0))
@@ -213,13 +217,13 @@ class Game:
                         self.transition = min(30, self.transition + 1)
                     if self.dead > 40:
                         self.show_death_indicator()
-                        self.lives -= 1  # Decrease a life
+                        self.lives -= 1
                         if self.lives > 0:
-                            self.load_level(self.level)  # Respawn in current level
+                            self.load_level(self.level)
                         else:
-                            self.lives = 3  # Reset lives
-                            self.level = 0  # Start from first level
-                            self.load_level(self.level)  # Respawn in first level
+                            self.lives = 3
+                            self.level = 0
+                            self.load_level(self.level)
 
                 self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]) / 30
                 self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1]) / 30
@@ -246,7 +250,6 @@ class Game:
                     self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
                     self.player.render(self.display, offset=render_scroll)
 
-                # [[x, y], direction, timer]
                 for projectile in self.projectiles.copy():
                     projectile[0][0] += projectile[1]
                     projectile[2] += 1
@@ -323,20 +326,18 @@ class Game:
                     transition_surf.set_colorkey((255, 255, 255))
                     self.display.blit(transition_surf, (0, 0))
 
-                    # Draw the lives text after all game updates but before blitting to self.display_2
+                """Draw the lives text after all game updates but before blitting to self.display_2"""
                 for i in range(self.lives):
                     heart_surface = heart_font.render(heart_emoji, True, (255, 0, 0))  # Render the heart emoji
                     self.display.blit(heart_surface, (10 + i * (heart_surface.get_width() + 5), 10))
 
-                # Blit self.display onto self.display_2
                 self.display_2.blit(self.display, (0, 0))
 
-                # Final blit operations to self.screen with screenshake effect
+                """Final blit operations to self.screen with screenshake effect"""
                 screenshake_offset = (random.random() * self.screenshake - self.screenshake / 2,
                                       random.random() * self.screenshake - self.screenshake / 2)
                 self.screen.blit(pygame.transform.scale(self.display_2, self.screen.get_size()), screenshake_offset)
 
-                # Update the display and tick the clock
                 pygame.display.update()
                 self.clock.tick(60)
 
