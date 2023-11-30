@@ -12,8 +12,8 @@ class Particle:
         self.animation = self.game.assets['particle/' + p_type].copy()
         self.animation.frame = frame
 
-    """Updates the state of the particle."""
     def update(self):
+        """Updates the state of the particle."""
         kill = False
         if self.animation.done:
             kill = True
