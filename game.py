@@ -82,8 +82,8 @@ class Game:
 
         self.spawn_point = None
 
-    """Loads a game level, setting up the environment, player position, enemies, and other entities."""
     def load_level(self, map_id):
+        """Loads a game level, setting up the environment, player position, enemies, and other entities."""
         self.show_level_indicator(self.level)
 
         self.tilemap.load('data/maps/' + str(map_id) + '.json')
@@ -115,8 +115,8 @@ class Game:
         self.dead = 0
         self.transition = -30
 
-    """ Displays a level loading indicator on the screen"""
     def show_level_indicator(self, level):
+        """ Displays a level loading indicator on the screen"""
         indicator_font = pygame.font.Font(None, 36)
         indicator_text = f"Level {level + 1} loading ..."
 
@@ -135,8 +135,8 @@ class Game:
         while pygame.time.get_ticks() - start_time < 500:
             pygame.event.pump()
 
-    """Manages the transition between levels, showing the level loading indicator."""
     def run_level_indicator(self):
+        """Manages the transition between levels, showing the level loading indicator."""
         self.transition = 0
         self.dead = 0
 
@@ -163,8 +163,8 @@ class Game:
 
         self.load_level(self.level)
 
-    """Displays death indicator on screen"""
     def show_death_indicator(self):
+        """Displays death indicator on screen"""
         indicator_font = pygame.font.Font(None, 36)
         indicator_text = "You died!"
 
@@ -182,8 +182,8 @@ class Game:
         while pygame.time.get_ticks() - start_time < 1000:
             pygame.event.pump()
 
-    """the main game loop"""
     def run(self):
+        """the main game loop"""
         pygame.mixer.music.load('data/music.wav')
         pygame.mixer.music.set_volume(0.5)
         pygame.mixer.music.play(-1)

@@ -51,14 +51,15 @@ class Editor:
         map_files = [f for f in os.listdir(map_folder) if f.endswith('.json')]
         return len(map_files)
 
-    """Clears the current tilemap and sets a default spawn point."""
+
     def create_new_map(self):
+        """Clears the current tilemap and sets a default spawn point."""
         self.tilemap.clear()
         self.tilemap.autotile()
         self.spawn_point = (100, 100)
 
-    """Loads a map from a file, handling missing files by creating a new map."""
     def load_map(self, map_number):
+        """Loads a map from a file, handling missing files by creating a new map."""
         map_file_path = f'data/maps/{map_number}.json'
         try:
             self.tilemap.load(map_file_path)
@@ -208,9 +209,8 @@ class Editor:
                         self.movement[3] = False
                     if event.key == pygame.K_LSHIFT:
                         self.shift = False
-
+            """Optionally, render a visual indicator for the spawn point"""
             if self.spawn_point:
-                """Optionally, render a visual indicator for the spawn point"""
                 spawn_indicator = pygame.Surface((self.tilemap.tile_size, self.tilemap.tile_size))
                 spawn_indicator.fill((0, 255, 0))
                 self.display.blit(spawn_indicator, (self.spawn_point[0] * self.tilemap.tile_size - self.scroll[0],

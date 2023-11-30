@@ -6,10 +6,10 @@ import pygame
 from scripts.particle import Particle
 from scripts.spark import Spark
 
-"""A base class for game entities that have physics-based interactions."""
-
 
 class PhysicsEntity:
+    """A base class for game entities that have physics-based interactions."""
+
     def __init__(self, game, e_type, pos, size):
         self.game = game
         self.type = e_type
@@ -33,9 +33,8 @@ class PhysicsEntity:
             self.action = action
             self.animation = self.game.assets[self.type + '/' + self.action].copy()
 
-    """Handles the entity's movement and collision detection with a tilemap"""
-
     def update(self, tilemap, movement=(0, 0)):
+        """Handles the entity's movement and collision detection with a tilemap"""
         self.collisions = {'up': False, 'down': False, 'right': False, 'left': False}
 
         frame_movement = (movement[0] + self.velocity[0], movement[1] + self.velocity[1])
@@ -89,12 +88,11 @@ class Enemy(PhysicsEntity):
 
         self.walking = 0
 
-    """Implements enemy-specific behaviors"""
-
     def update(self, tilemap, movement=(0, 0)):
+        """Implements enemy-specific behaviors"""
         if self.walking:
             if tilemap.solid_check((self.rect().centerx + (-7 if self.flip else 7), self.pos[1] + 23)):
-                if (self.collisions['right'] or self.collisions['left']):
+                if self.collisions['right'] or self.collisions['left']:
                     self.flip = not self.flip
                 else:
                     movement = (movement[0] - 0.5 if self.flip else 0.5, movement[1])
@@ -103,14 +101,14 @@ class Enemy(PhysicsEntity):
             self.walking = max(0, self.walking - 1)
             if not self.walking:
                 dis = (self.game.player.pos[0] - self.pos[0], self.game.player.pos[1] - self.pos[1])
-                if (abs(dis[1]) < 16):
-                    if (self.flip and dis[0] < 0):
+                if abs(dis[1]) < 16:
+                    if self.flip and dis[0] < 0:
                         self.game.sfx['shoot'].play()
                         self.game.projectiles.append([[self.rect().centerx - 7, self.rect().centery], -1.5, 0])
                         for i in range(4):
                             self.game.sparks.append(Spark(self.game.projectiles[-1][0], random.random() - 0.5 + math.pi,
                                                           2 + random.random()))
-                    if (not self.flip and dis[0] > 0):
+                    if not self.flip and dis[0] > 0:
                         self.game.sfx['shoot'].play()
                         self.game.projectiles.append([[self.rect().centerx + 7, self.rect().centery], 1.5, 0])
                         for i in range(4):
@@ -142,8 +140,8 @@ class Enemy(PhysicsEntity):
                 self.game.sparks.append(Spark(self.rect().center, math.pi, 5 + random.random()))
                 return True
 
-    """Renders the enemy and its gun on the screen"""
     def render(self, surf, offset=(0, 0)):
+        """Renders the enemy and its gun on the screen"""
         super().render(surf, offset=offset)
 
         if self.flip:
@@ -165,8 +163,8 @@ class Player(PhysicsEntity):
         self.emoji_font = pygame.font.SysFont('segoeuisymbol', 12)  # Use a font that supports emojis
         self.emoji = '💫'
 
-    """Manages the player's movement and actions, updates player position based on input and applies gravity"""
     def update(self, tilemap, movement=(0, 0)):
+        """Manages the player's movement and actions, updates player position based on input and applies gravity"""
         super().update(tilemap, movement=movement)
 
         self.air_time += 1
@@ -232,8 +230,8 @@ class Player(PhysicsEntity):
             1] - emoji_surface.get_height() - 5  # Adjust -5 for the gap between emoji and character
         surf.blit(emoji_surface, (emoji_x, emoji_y))
 
-    """Handles the player's jumping logic, including wall jumps and regular jumps."""
     def jump(self):
+        """Handles the player's jumping logic, including wall jumps and regular jumps."""
         if self.wall_slide:
             if self.flip and self.last_movement[0] < 0:
                 self.velocity[0] = 3.5
@@ -254,8 +252,8 @@ class Player(PhysicsEntity):
             self.air_time = 5
             return True
 
-    """Initiates the player's dash movement and plays the corresponding sound effect."""
     def dash(self):
+        """Initiates the player's dash movement and plays the corresponding sound effect."""
         if not self.dashing:
             self.game.sfx['dash'].play()
             if self.flip:

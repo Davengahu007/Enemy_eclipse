@@ -31,8 +31,8 @@ class Menu:
         self.logo = self.load_and_make_circular(logo_path)
         self.logo_rect = self.logo.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2 - 50))
 
-    def load_and_make_circular(self, image_path):
-
+    @staticmethod
+    def load_and_make_circular(image_path):
         """Load the image"""
         image = pygame.image.load(image_path).convert_alpha()
 
