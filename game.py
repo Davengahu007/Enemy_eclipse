@@ -61,7 +61,7 @@ class Game:
         self.sfx['shoot'].set_volume(0.4)
         self.sfx['hit'].set_volume(0.8)
         self.sfx['dash'].set_volume(0.3)
-        self.sfx['jump'].set_volume(0.7)
+        self.sfx['jump'].set_volume(0.8)
 
         self.clouds = Clouds(self.assets['clouds'], count=16)
 
@@ -69,7 +69,7 @@ class Game:
 
         self.tilemap = Tilemap(self, tile_size=16)
 
-        self.menu = Menu(self.screen,self)
+        self.menu = Menu(self.screen, self)
 
         self.level = 0
         self.lives = 3
