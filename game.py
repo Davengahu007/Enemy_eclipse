@@ -217,6 +217,8 @@ class Game:
 
                 if self.transition < 0:
                     self.transition += 1
+                    
+                    """check if the player is alive"""
 
                 if self.dead:
                     self.dead += 1
