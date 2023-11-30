@@ -15,7 +15,7 @@ class Menu:
         self.background = pygame.image.load(background_path)
         self.background = pygame.transform.scale(self.background, self.screen.get_size())
 
-        """Load icon image"""
+        """Load start icon"""
         icon_path = os.path.join('data', 'images', 'start.png')
         self.icon = pygame.image.load(icon_path).convert_alpha()
         white = (255, 255, 255)
