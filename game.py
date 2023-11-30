@@ -20,7 +20,7 @@ class Game:
         pygame.init()
 
         pygame.display.set_caption('Enemy Eclipse')
-        self.screen = pygame.display.set_mode((640, 480))
+        self.screen = pygame.display.set_mode((840, 580))
         self.display = pygame.Surface((320, 240), pygame.SRCALPHA)
         self.display_2 = pygame.Surface((320, 240))
 
